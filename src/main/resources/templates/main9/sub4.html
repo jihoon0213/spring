@@ -6,13 +6,158 @@
 </head>
 <body>
 <h3> /main9/sub4 </h3>
+
+<form action="">
+
+    <!--  연습 : 여러 취미를 중복 선택 가능한 select 요소를 작성해보기  -->
+    <div>
+        <select name="hobby" id="" multiple>
+            <option value="cook">요리</option>
+            <option value="sports">운동</option>
+            <option value="walk">산책</option>
+            <option value="movie">영화</option>
+            <option value="reading">독서</option>
+        </select>
+    </div>
+
+    <!--    select : 여러 값 중에 선택 가능한 요소 -->
+    <select name="country" id="" multiple required>
+        <option value="korea" selected>한국</option>
+        <option value="us">미국</option>
+        <option value="uk">영국</option>
+        <option value="japan">일본</option>
+        <option value="china" selected>중국</option>
+    </select>
+    <br>
+    <!--    select : 여러 값 중에 선택 가능한 요소 -->
+    <select name="fruit" id="">
+        <option value="apple">사과</option>
+        <option value="melon">멜론</option>
+        <option value="mango" selected>망고</option>
+        <option value="lemon">레몬</option>
+        <option value="banana">바나나</option>
+    </select>
+    <div>
+        <input type="submit" value="전송">
+    </div>
+</form>
+<hr>
+
+<form action="">
+    <div>
+        <!-- textarea : 긴 텍스트 작성용 -->
+        <textarea name="info3" id="" cols="30" rows="10"
+                  placeholder="정보 입력하세요"
+                  required
+                  readonly
+        ></textarea>
+    </div>
+    <div>
+        <!-- textarea : 긴 텍스트 작성용 -->
+        <textarea name="info2" id="" cols="30" rows="10">기본 텍스트 입력</textarea>
+    </div>
+    <div>
+        <!-- textarea : 긴 텍스트 작성용 -->
+        <textarea name="info" id="" cols="30" rows="10"></textarea>
+    </div>
+    <div>
+        <input type="text" name="city">
+    </div>
+    <div>
+        <input type="submit" value="전송 ">
+    </div>
+
+</form>
+
+<hr>
+
+<form th:action="@{/main9/sub13}">
+    <!--  request handler method를 보고 아래 input 요소들 만들기   -->
+    <div>
+        <label for="input1">도시</label>
+        <input type="text" id="input1" name="city">
+    </div>
+    <div>
+        <label for="input2">나이</label>
+        <input type="number" id="input2" name="age">
+    </div>
+    <div>
+        <label for="input3">점수</label>
+        <input type="number" step="0.01" id="input3" name="score">
+    </div>
+    <div>
+        <label for="check1">사과</label>
+        <input type="checkbox" id="check1" name="fruits" value="apple">
+        <label for="check2">망고</label>
+        <input type="checkbox" id="check2" name="fruits" value="mango">
+        <label for="check3">멜론</label>
+        <input type="checkbox" id="check3" name="fruits" value="melon">
+    </div>
+    <div>
+        <label for="radio1">동의</label>
+        <input type="radio" name="accepted" id="radio1" value="true">
+        <label for="radio2">동의안함</label>
+        <input type="radio" name="accepted" id="radio2" value="false">
+    </div>
+    <div>
+        <input type="submit" value="전송">
+    </div>
+</form>
+
+<hr>
+
+<form action="">
+    <!--  required : 필수 입력  -->
+    <input type="text" name="city" required>
+    <!--  multiple : 여러개 선택   -->
+    <input type="file" name="f" id="" multiple>
+    <!--  placeholder : 입력할 값의 hint  -->
+    <input type="text" name="address" placeholder="주소를 입력하세요.">
+    <!--    readonly : 변경 불가 -->
+    <input type="text" name="name" value="홍길동" readonly>
+
+    <input type="submit">
+</form>
+
+<hr>
+
+<form th:action="@{/main9/sub12}">
+    <div>
+        <!-- 연습 : 3개의 country 중에 하나만 선택할 수 있는 radio 버튼 만들기-->
+        <label for="radio-korea">한국</label>
+        <input type="radio" id="radio-korea" name="country" value="korea">
+        <label for="radio-us">미국</label>
+        <input type="radio" id="radio-us" name="country" value="us">
+        <label for="radio-jp">일본</label>
+        <input type="radio" id="radio-jp" name="country" value="japan">
+
+    </div>
+
+
+    <div>
+        <!-- radio button : 같은 name 중에 하나의 값만 선택 가능 -->
+        <label for="radio-mango">망고</label>
+        <input type="radio" name="fruit" id="radio-mango" value="mango">
+
+        <label for="radio-melon">멜론</label>
+        <input type="radio" name="fruit" id="radio-melon" value="melon" checked>
+
+        <label for="radio-apple">사과</label>
+        <input type="radio" name="fruit" id="radio-apple" value="apple">
+    </div>
+
+    <input type="submit" value="전송">
+</form>
+<hr>
+
 <form th:action="@{/main9/sub11}">
-    <!--  label : 특정 input에 붙인 텍스트  -->
+    <!--    label : 특정 input에 붙인 텍스트 -->
     <label for="input-mango">
-        adfadf
+        망고
     </label>
     <input type="checkbox" name="fruit" id="input-mango" value="mango">
 
+    <!-- 연습:   멜론, 사과도 label로 만들기 -->
     <label for="input-melon">
         멜론
     </label>
@@ -22,21 +167,50 @@
         사과
     </label>
     <input type="checkbox" name="fruit" id="input-apple" value="apple">
+
+    <label>
+        바나나
+        <input type="checkbox" name="fruit" value="banana">
+    </label>
+
+    <div>
+        <label for="input-text">
+            이름
+        </label>
+        <input type="text" id="input-text" name="name" value="머스크">
+    </div>
+
 </form>
 
+<hr>
 
-<form action="@{/main9/sub10}">
+<form th:action="@{/main9/sub10}">
+    <div>
+        <input type="checkbox" name="hobby" id="" value="baseball">
+        야구
+        <input type="checkbox" name="hobby" id="" value="basketball">
+        농구
+        <input type="checkbox" name="hobby" id="" value="football">
+        축구
+        <input type="checkbox" name="hobby" id="" value="rugby">
+        럭비
+        <input type="checkbox" name="hobby" id="" value="cook">
+        요리
+    </div>
 
-    <!--  checkbox-->
+    <!--    연습 : 체크하면 hello라는 값이 넘어갈 수 있는 checkbox 만들기 -->
+    <div>
+        <input type="checkbox" name="greeting" value="hello" checked>
+    </div>
+    <!--  checkbox  -->
     <div>
         <input type="checkbox" name="accept" value="true">
     </div>
 
     <div>
-        <input type="submit" name="전송">
+        <input type="submit" value="전송">
     </div>
 </form>
-
 <hr>
 
 <form th:action="@{/main9/sub9}">
