@@ -74,3 +74,8 @@ WHERE CategoryID = 1
 ORDER BY Price
 LIMIT 1,1;
 
+SELECT ProductName, CategoryID, Price
+FROM Products
+WHERE CategoryID = 1
+ORDER BY Price
+LIMIT 1,3;
