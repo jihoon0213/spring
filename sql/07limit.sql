@@ -79,3 +79,18 @@ FROM Products
 WHERE CategoryID = 1
 ORDER BY Price
 LIMIT 1,3;
+
+SELECT *
+FROM Products
+WHERE ProductID = 1;
+
+SELECT *
+FROM OrderDetails
+ORDER BY Quantity DESC;
+
+SELECT *
+FROM Customers;
+
+
+
+
