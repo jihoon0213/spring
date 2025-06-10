@@ -1,6 +1,7 @@
 package com.example.spring.controller;
 
 import com.example.spring.dto.CustomerDto;
+import com.example.spring.dto.ProductDto;
 import com.example.spring.dto.SupplierDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -76,16 +77,18 @@ public class Controller15 {
         return "main15/sub1";
     }
 
-    // 연습 :
-    // 한 페이지에 5개의 공급자가 출력되도록 코드 작성(정렬은 공급자 번호순)
+    // 연습:
+    // 한 페이지에 5개의 공급자가 출력되도록 코드 작성 (정렬은 공급자 번호 순)
     // request handler method, html
-
     @GetMapping("sub2")
     public String sub2(
             @RequestParam(defaultValue = "1")
             Integer page,
-            Model model) throws SQLException {
-        // 한 페이지에 5개씩
+            Model model) throws Exception {
+        String countSql = """
+                SELECT COUNT(*) AS count
+                FROM Suppliers
+                """;
         String sql = """
                 SELECT *
                 FROM Suppliers
@@ -93,43 +96,183 @@ public class Controller15 {
                 LIMIT ?, ?
                 """;
 
-        String countSql = """
-                SELECT COUNT(*) AS count
-                FROM Suppliers
-                """;
-
         String url = "jdbc:mysql://localhost:3306/w3schools";
         String username = "root";
         String password = "1234";
         Connection connection = DriverManager.getConnection(url, username, password);
+        ResultSet rs2 = connection.prepareStatement(countSql).executeQuery();
+        rs2.next();
+        int count = rs2.getInt("count");// 총 레코드 수
+        int lastPage = (count - 1) / 5 + 1; // 마지막 페이지 번호
+
+        model.addAttribute("lastPage", lastPage);
+
         PreparedStatement statement = connection.prepareStatement(sql);
 
         int offset = (page - 1) * 5;
         statement.setInt(1, offset);
         statement.setInt(2, 5);
 
-        ResultSet rs2 = connection.prepareStatement(countSql).executeQuery();
-        rs2.next();
-        int count = rs2.getInt("count");
-        int lastPage = (count - 1) / 5 + 1;
-
-        model.addAttribute("lastPage", lastPage);
-        ResultSet rs = statement.executeQuery();
+        ResultSet resultSet = statement.executeQuery();
         List<SupplierDto> list = new ArrayList<>();
-        while (rs.next()) {
+        while (resultSet.next()) {
             SupplierDto supplierDto = new SupplierDto();
-            supplierDto.setId(rs.getInt("SupplierId"));
-            supplierDto.setName(rs.getString("SupplierName"));
-            supplierDto.setCity(rs.getString("City"));
-            supplierDto.setCountry(rs.getString("Country"));
-            supplierDto.setAddress(rs.getString("Address"));
-            supplierDto.setPostalCode(rs.getString("PostalCode"));
-            supplierDto.setPhone(rs.getString("Phone"));
-            supplierDto.setContact(rs.getString("ContactName"));
+            supplierDto.setId(resultSet.getInt("SupplierID"));
+            supplierDto.setName(resultSet.getString("SupplierName"));
+            supplierDto.setContact(resultSet.getString("ContactName"));
+            supplierDto.setAddress(resultSet.getString("Address"));
+            supplierDto.setCity(resultSet.getString("City"));
+            supplierDto.setPostalCode(resultSet.getString("PostalCode"));
+            supplierDto.setCountry(resultSet.getString("Country"));
+            supplierDto.setPhone(resultSet.getString("Phone"));
             list.add(supplierDto);
+
         }
         model.addAttribute("supplierList", list);
+
+
         return "main15/sub2";
     }
 
+    // 검색 + 페이징
+    @GetMapping("sub3")
+    public String sub3(
+            @RequestParam(defaultValue = "1")
+            Integer page,
+            @RequestParam(defaultValue = "")
+            String keyword,
+            Model model) throws Exception {
+
+        String countSql = """
+                SELECT COUNT(*) AS count
+                FROM Customers
+                WHERE CustomerName LIKE ?
+                   OR ContactName LIKE ?
+                """;
+        String sql = """
+                SELECT *
+                FROM Customers
+                WHERE CustomerName LIKE ?
+                   OR ContactName LIKE ?
+                ORDER BY CustomerID
+                LIMIT ?, ?
+                """;
+        String url = "jdbc:mysql://localhost:3306/w3schools";
+        String username = "root";
+        String password = "1234";
+        Connection connection = DriverManager.getConnection(url, username, password);
+        PreparedStatement countStmt = connection.prepareStatement(countSql);
+        countStmt.setString(1, "%" + keyword + "%");
+        countStmt.setString(2, "%" + keyword + "%");
+        PreparedStatement selectStmt = connection.prepareStatement(sql);
+        selectStmt.setString(1, "%" + keyword + "%");
+        selectStmt.setString(2, "%" + keyword + "%");
+
+        int offset = (page - 1) * 5;
+        selectStmt.setInt(3, offset);
+        selectStmt.setInt(4, 5);
+
+        ResultSet rs1 = countStmt.executeQuery();
+        rs1.next();
+        int count = rs1.getInt("count"); // 총 레코드 수
+        int lastPage = (count - 1) / 5 + 1; // 마지막 페이지
+        int rightPage = ((page - 1) / 10 + 1) * 10; // 오른쪽 페이지번호
+        int leftPage = rightPage - 9; // 왼쪽 페이지 번호
+        int prevPage = leftPage - 10;
+        int nextPage = rightPage + 1;
+        rightPage = Math.min(rightPage, lastPage); // 오른쪽 페이지번호는 마지막보다 클수없음
+        model.addAttribute("lastPage", lastPage); // 마지막 페이지
+        model.addAttribute("rightPage", rightPage);
+        model.addAttribute("leftPage", leftPage);
+        model.addAttribute("prevPage", prevPage);
+        model.addAttribute("nextPage", nextPage);
+
+
+        ResultSet rs2 = selectStmt.executeQuery();
+        List<CustomerDto> list = new ArrayList<>();
+        while (rs2.next()) {
+            CustomerDto customerDto = new CustomerDto();
+            customerDto.setId(rs2.getInt("CustomerID"));
+            customerDto.setName(rs2.getString("CustomerName"));
+            customerDto.setContactName(rs2.getString("ContactName"));
+            customerDto.setAddress(rs2.getString("Address"));
+            customerDto.setCity(rs2.getString("City"));
+            customerDto.setPostalCode(rs2.getString("PostalCode"));
+            customerDto.setCountry(rs2.getString("Country"));
+            list.add(customerDto);
+
+        }
+        model.addAttribute("customerList", list);
+
+        return "main15/sub3";
+
+    }
+
+    // 연습
+    // 상품명 조회 로직 작성 (w/ paging)
+    // 페이지네이션 완성(이전, 다음)
+    @GetMapping("sub4")
+    public String sub4(@RequestParam(defaultValue = "1") Integer page,
+                       @RequestParam(defaultValue = "") String keyword,
+                       Model model) throws Exception {
+        String sql = """
+                SELECT *
+                FROM Products
+                WHERE ProductName LIKE ?
+                ORDER BY ProductID
+                LIMIT ?, ?
+                """;
+        String countSql = """
+                SELECT COUNT(*) AS count
+                FROM Products
+                WHERE ProductName LIKE ?
+                """;
+        String url = "jdbc:mysql://localhost:3306/w3schools";
+        String username = "root";
+        String password = "1234";
+        Connection connection = DriverManager.getConnection(url, username, password);
+        PreparedStatement countStmt = connection.prepareStatement(countSql);
+        countStmt.setString(1, "%" + keyword + "%");
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setString(1, "%" + keyword + "%");
+        int offset = (page - 1) * 5;
+        statement.setInt(2, offset);
+        statement.setInt(3, 5);
+
+        ResultSet rs1 = countStmt.executeQuery();
+        rs1.next();
+        int count = rs1.getInt("count"); // 총 레코드 수
+        int lastPage = (count - 1) / 5 + 1; // 마지막 페이지 번호
+        int rightPage = ((page - 1) / 10 + 1) * 10;
+        int leftPage = rightPage - 9;
+        int prevPage = leftPage - 10;
+        int nextPage = rightPage + 1;
+
+        rightPage = Math.min(rightPage, lastPage);
+
+        model.addAttribute("leftPage", leftPage);
+        model.addAttribute("rightPage", rightPage);
+        model.addAttribute("prevPage", prevPage);
+        model.addAttribute("nextPage", nextPage);
+        model.addAttribute("lastPage", lastPage);
+        ResultSet rs2 = statement.executeQuery();
+        List<ProductDto> list = new ArrayList<>();
+
+        while (rs2.next()) {
+            ProductDto productDto = new ProductDto();
+            productDto.setId(rs2.getInt("ProductID"));
+            productDto.setName(rs2.getString("ProductName"));
+            productDto.setSupplier(rs2.getInt("SupplierID"));
+            productDto.setCategory(rs2.getInt("CategoryID"));
+            productDto.setUnit(rs2.getString("Unit"));
+            productDto.setPrice(rs2.getDouble("Price"));
+            list.add(productDto);
+        }
+
+        model.addAttribute("productList", list);
+
+
+        return "main15/sub4";
+
+    }
 }
